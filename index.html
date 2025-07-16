@@ -1,0 +1,1927 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>မြန်မာ AI ဗေဒင်ဆရာ</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: transparent; /* Changed to transparent for body's base background */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Changed to flex-start to allow vertical scrolling */
+            min-height: 100vh;
+            padding: 1rem;
+            box-sizing: border-box;
+            position: relative; /* Needed for ::before pseudo-element positioning */
+            overflow-x: hidden; /* Hide horizontal overflow */
+            overflow-y: auto; /* Allow vertical scrolling */
+            padding-top: 3.5rem; /* Add padding to the top to account for the fixed navbar */
+        }
+
+        body::before {
+            content: '';
+            position: fixed; /* Fixed position to cover the entire viewport */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.75)),
+                              url('https://img.freepik.com/premium-photo/abstract-old%E2%80%A6mysticism-astrology-fantasy_521059-7714.jpg?w=740');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-blend-mode: overlay;
+            filter: blur(3px); /* Apply blur only to the background image */
+            z-index: -1; /* Place behind other content */
+        }
+
+        .container {
+            position: relative;
+            z-index: 1; /* Ensure container is above the blurred background */
+            background-color: transparent; /* Changed to transparent */
+            overflow: hidden;
+            border-radius: 1.0rem;
+            box-shadow: none; /* Removed box-shadow */
+            max-width: 600px;
+            width: 100%;
+            padding: 2.0rem;
+            text-align: center;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease-out forwards;
+            animation-delay: 0.2s;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+        .input-group label {
+            position: absolute;
+            top: 0.75rem;
+            left: 1rem;
+            font-size: 1.0rem;
+            color: #ffffff;
+            pointer-events: none;
+            transition: all 0.2s ease-out;
+            transform-origin: left top;
+            background: linear-gradient(to right, #6366f1, #8b5cf6);
+            background-clip: padding-box;
+            padding: 0 0.25rem;
+            z-index: 1;
+            text-shadow: 0.5px 0.5px 1.5px rgba(0,0,0,0.4);
+        }
+        .input-group input:not(:placeholder-shown) + label,
+        .input-group textarea:not(:placeholder-shown) + label,
+        .input-group input:focus + label,
+        .input-group textarea:focus + label {
+            top: -0.5rem;
+            font-size: 0.8rem;
+            color: #ffffff;
+            transform: scale(0.9);
+            left: 0.75rem;
+            z-index: 2;
+            background: linear-gradient(to right, #6366f100, #ffca0000);
+            background-clip: padding-box;
+        }
+        .input-group input,
+        .input-group textarea {
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            width: 100%;
+            font-size: 1.0rem;
+            outline: none;
+            transition: all 0.3s ease-in-out;
+            resize: vertical;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            background: linear-gradient(to right, #6366f1, #8b5cf6);
+            position: relative;
+            z-index: 0;
+            color: #ffffff;
+            text-shadow: 0.5px 0.5px 1.5px rgba(0,0,0,0.4);
+        }
+        .input-group input:focus,
+        .input-group textarea:focus {
+            border-color: #c7d2fe;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.4);
+            transform: translateY(-2px);
+            background: linear-gradient(to right, #4f46e5, #7c3aed);
+        }
+        .input-group input::placeholder,
+        .input-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+            text-shadow: none;
+        }
+
+        #askButton, #backToMainButton, #backToDailyButton, #backToMainFromTarotButton, #interpretDreamButton, #backToMainFromDreamButton, #pickAnotherCardButton {
+            background: linear-gradient(to right, #6366f1, #8b5cf6);
+            color: white;
+            padding: 1.0rem 2.0rem;
+            border-radius: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            width: 75%;
+            max-width: 300px;
+            border: none;
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+            display: block;
+            margin: 1.5rem auto;
+            letter-spacing: 0.05em;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+        #askButton:hover, #backToMainButton:hover, #backToDailyButton:hover, #backToMainFromTarotButton:hover, #interpretDreamButton:hover, #backToMainFromDreamButton:hover, #pickAnotherCardButton:hover {
+            background: linear-gradient(to right, #4f46e5, #7c3aed);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.5);
+        }
+        #askButton:active, #backToMainButton:active, #backToDailyButton:active, #backToMainFromTarotButton:active, #interpretDreamButton:active, #backToMainFromDreamButton:active, #pickAnotherCardButton:active {
+            transform: translateY(0) scale(0.98);
+            box-shadow: 0 2px 10px rgba(99, 102, 241, 0.3);
+        }
+
+        .loading {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #6366f1;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            display: none;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .response-box {
+            background-color: rgba(224, 242, 247, 0.9);
+            border-left: 4px solid #007bff;
+            padding: 1.25rem;
+            border-radius: 0.5rem;
+            text-align: left;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: #1f2937;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease-out forwards;
+            margin: 0 auto;
+        }
+        .response-box .horoscope-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: #ffffff;
+            background: linear-gradient(to right, #6366f1, #8b5cf6);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            text-shadow: 0.5px 0.5px 1.5px rgba(0,0,0,0.4);
+            text-align: center;
+        }
+        .response-box #horoscopeResult, .response-box #dailyHoroscopeResultContent, .response-box #dreamInterpretationResultContent {
+            margin-top: 0;
+            color: #1f2937;
+        }
+
+        .template-questions-section {
+            opacity: 0;
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+        .template-chip {
+            background-color: rgba(224, 231, 255, 0.9);
+            color: #312e81;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+        .template-chip:hover {
+            background-color: #c7d2fe;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .template-chip:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header-text-animation { animation-delay: 0.4s; }
+        .input-group:nth-of-type(1) { animation-delay: 0.6s; }
+        .input-group:nth-of-type(2) { animation-delay: 0.8s; }
+        .input-group:nth-of-type(3) { animation-delay: 1.0s; }
+        .input-group:nth-of-type(4) { animation-delay: 1.2s; }
+        .template-questions-section { animation-delay: 1.4s; }
+        #askButton { animation-delay: 1.6s; }
+        
+        /* Reverted text color for readability against transparent background */
+        h1.text-3xl {
+            color: #ffca00; /* Original Yellow */
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.4); /* Original text shadow */
+        }
+        p.text-gray-600,
+        .template-questions-section p {
+            color: #ffca00; /* Original Yellow */
+            text-shadow: 0.5px 0.5px 1.5px rgba(0,0,0,0.4); /* Original text shadow */
+        }
+
+        /* Styles for daily horoscope icons */
+        .day-icons-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease-out forwards;
+            animation-delay: 0.2s;
+        }
+        @media (max-width: 480px) {
+            .day-icons-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        @media (max-width: 320px) {
+            .day-icons-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .day-icon {
+            background: linear-gradient(to bottom right, #ffffff, #e0e7ff);
+            color: #4f46e5;
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            font-size: 2.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            font-weight: bold;
+            height: 90px;
+        }
+        .day-icon:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(to bottom right, #e0e7ff, #c7d2fe);
+        }
+        .day-icon:active {
+            transform: translateY(0) scale(0.98);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .day-icon span {
+            font-size: 0.8rem;
+            margin-top: 0.4rem;
+            color: #312e81;
+            font-weight: 600;
+        }
+        .day-icon.selected {
+            border: 3px solid #6366f1;
+            box-shadow: 0 0 0 5px rgba(99, 102, 241, 0.3);
+            background: linear-gradient(to right, #a78bfa, #c4b5fd);
+        }
+        .daily-horoscope-result-area {
+            opacity: 0;
+            animation: fadeInUp 0.6s ease-out forwards;
+            animation-delay: 0.4s;
+        }
+
+        /* Tarot Card Section Styles */
+        #tarotCardSection {
+            background-color: transparent; /* Changed to transparent */
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: none; /* Removed box-shadow */
+        }
+        .tarot-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 0.5rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .tarot-card-back {
+            background-color: #312e81;
+            border: 2px solid #6366f1;
+            border-radius: 0.5rem;
+            aspect-ratio: 2 / 3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #a78bfa;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        .tarot-card-back::before {
+            content: '✨';
+            position: absolute;
+            font-size: 1.5rem;
+            opacity: 0.3;
+            animation: rotatePattern 10s linear infinite;
+            pointer-events: none;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(var(--rotation, 0deg));
+            z-index: 0;
+        }
+        @keyframes rotatePattern {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        .tarot-card-back:hover {
+            transform: scale(1.05) translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+        }
+        .tarot-card-back.selected-card {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 5px rgba(245, 158, 11, 0.5);
+            transform: scale(1.1);
+        }
+
+        /* Modal / Dialog Box Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        .modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background-color: #ffffff;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 700px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            position: relative;
+            transform: translateY(20px);
+            opacity: 0;
+            animation: modalSlideIn 0.3s ease-out forwards;
+        }
+        .modal.show .modal-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        .modal-close-button {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+            transition: color 0.2s;
+        }
+        .modal-close-button:hover {
+            color: #1f2937;
+        }
+        .modal-body {
+            display: flex;
+            gap: 1.5rem;
+            text-align: left;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .modal-card-display {
+            flex: 1;
+            min-width: 150px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .modal-card-display img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        .modal-card-display .card-name {
+            font-weight: 700;
+            margin-top: 0.5rem;
+            color: #312e81;
+        }
+        .modal-reading-content {
+            flex: 2;
+            min-width: 250px;
+            overflow-y: auto;
+            max-height: 400px;
+            padding-right: 0.5rem;
+        }
+        .modal-reading-content h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #4f46e5;
+            margin-bottom: 0.5rem;
+        }
+        .modal-reading-content p {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #374151;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+        /* Style for modal-specific loading */
+        .modal-loading-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+            text-align: center;
+        }
+        .modal-loading-indicator p {
+            margin-top: 1rem;
+            font-size: 1.2rem;
+            color: #6366f1;
+            font-weight: 600;
+        }
+        /* Dream interpretation specific styles */
+        #dreamInterpretationSection .input-group textarea {
+            min-height: 120px;
+        }
+        .dream-interpretation-result-area {
+            opacity: 0;
+            animation: fadeInUp 0.6s ease-out forwards;
+            animation-delay: 0.4s;
+        }
+
+        /* New styles for dream templates */
+        .dream-templates-section {
+            opacity: 0;
+            animation: fadeInUp 0.6s ease-out forwards;
+            animation-delay: 0.4s;
+            margin-top: 1.5rem;
+        }
+        .dream-template-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 250px; /* Limit height for scrollability */
+            overflow-y: auto;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 0.5rem;
+            background-color: rgba(255, 255, 255, 0.8);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        .dream-template-item {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            text-align: left;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            color: #374151; /* Dark gray text */
+        }
+        .dream-template-item:last-child {
+            border-bottom: none;
+        }
+        .dream-template-item:hover {
+            background-color: rgba(224, 242, 247, 0.9); /* Light blue on hover */
+        }
+        .dream-template-item span {
+            font-weight: 600; /* Number/prefix bold */
+            color: #4f46e5; /* Indigo color for number */
+            margin-right: 0.5rem;
+        }
+
+        /* Navigation Bar Styles */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 50;
+            background: linear-gradient(to right, #6366f1, #8b5cf6);
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        nav h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: white;
+            letter-spacing: 0.025em;
+            flex-shrink: 0;
+        }
+        nav h2 span {
+            font-size: 1.3rem;
+        }
+
+        .nav-item {
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease-in-out;
+        }
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        /* Active nav item style */
+        .nav-item.active {
+            background-color: white;
+            color: #4f46e5;
+            font-weight: 700;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Left Side Bar (Main Navigation for Mobile) */
+        #leftSidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            height: 100%;
+            background: linear-gradient(to bottom, #4f46e5, #7c3aed);
+            color: white;
+            z-index: 100; /* Higher z-index for main navigation */
+            transform: translateX(-100%); /* Hidden by default */
+            transition: transform 0.3s ease-in-out;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            padding-top: 4rem; /* Space for fixed nav bar */
+        }
+
+        #leftSidebar.show-sidebar {
+            transform: translateX(0);
+        }
+        
+        #leftSidebar .sidebar-close-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: white;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        #leftSidebar .sidebar-close-button:hover {
+            color: #e0e7ff;
+        }
+
+        #leftSidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1;
+        }
+
+        #leftSidebar ul li a {
+            display: block;
+            padding: 0.75rem 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            text-decoration: none;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        #leftSidebar ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Right Side Bar (Info/About Navigation) */
+        #rightSidebar {
+            position: fixed;
+            top: 0;
+            right: 0; /* Position on the right */
+            width: 250px;
+            height: 100%;
+            background: linear-gradient(to bottom, #4f46e5, #7c3aed);
+            color: white;
+            z-index: 100; /* Same z-index, but they won't open at same time */
+            transform: translateX(100%); /* Hidden by default (slides from right) */
+            transition: transform 0.3s ease-in-out;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3); /* Shadow on left side */
+            display: flex;
+            flex-direction: column;
+            padding-top: 4rem;
+        }
+
+        #rightSidebar.show-sidebar {
+            transform: translateX(0);
+        }
+
+        #rightSidebar .sidebar-close-button { /* Re-use existing class for consistency */
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: white;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        #rightSidebar .sidebar-close-button:hover {
+            color: #e0e7ff;
+        }
+        #rightSidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1;
+        }
+        #rightSidebar ul li a {
+            display: block;
+            padding: 0.75rem 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            text-decoration: none;
+            transition: background-color 0.2s ease-in-out;
+        }
+        #rightSidebar ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Backdrop overlay when sidebar is open */
+        .sidebar-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 99; /* Below sidebars, above content */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+
+        .sidebar-backdrop.show-backdrop {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Mobile specific adjustments */
+        @media (min-width: 768px) {
+            #mainMenuToggleButton { /* Hide main hamburger on desktop */
+                display: none !important;
+            }
+            #mainNavDesktopLinks { /* Show desktop nav links */
+                display: flex !important;
+            }
+            #leftSidebar { /* Ensure left sidebar is hidden on desktop */
+                transform: translateX(-100%) !important;
+            }
+        }
+        @media (max-width: 767px) { /* Adjust breakpoint for mobile/tablet */
+            .container {
+                margin: auto;
+                padding: 2.0rem;
+            }
+            #mainNavDesktopLinks { /* Hide desktop nav links on mobile */
+                display: none;
+            }
+            /* Ensure hamburger button is visible and clickable on smaller screens */
+            .md\:hidden {
+                display: flex; /* Override hidden to ensure flex display */
+                align-items: center;
+                z-index: 60; /* Ensure button is above other nav content */
+            }
+            #mainMenuToggleButton, #infoSidebarToggleButton { /* Style buttons for touch */
+                cursor: pointer;
+                padding: 0.5rem;
+                border-radius: 0.5rem;
+                background-color: rgba(255, 255, 255, 0.1);
+                transition: background-color 0.2s ease-in-out;
+                border: 1px solid rgba(255, 255, 255, 0.5);
+            }
+            #mainMenuToggleButton:hover, #infoSidebarToggleButton:hover {
+                background-color: rgba(255, 255, 255, 0.3);
+            }
+        }
+        @media (max-width: 640px) {
+            .modal-body {
+                flex-direction: column;
+                align-items: center;
+            }
+            .modal-reading-content {
+                max-height: 250px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <!-- Left Side Bar (Main Navigation for Mobile) -->
+    <div id="leftSidebar">
+        <button class="sidebar-close-button" id="leftSidebarCloseButton">&times;</button>
+        <div class="p-4 text-center">
+            <h3 class="text-xl font-bold mb-4">Main Menu</h3>
+        </div>
+        <ul>
+            <li><a href="#" class="sidebar-nav-item" data-target="mainHoroscopeSection">ပင်မစာမျက်နှာ</a></li>
+            <li><a href="#" class="sidebar-nav-item" data-target="dailyHoroscopeSection">နေ့စဉ် ကံဇာတာ</a></li>
+            <li><a href="#" class="sidebar-nav-item" data-target="tarotCardSection">တားရော့ကဒ် ဗေဒင်</a></li>
+            <li><a href="#" class="sidebar-nav-item" data-target="dreamInterpretationSection">အိပ်မက် နိမိတ်ဖတ်ခြင်း</a></li>
+        </ul>
+    </div>
+
+    <!-- Right Side Bar (Info/About Navigation) -->
+    <div id="rightSidebar">
+        <button class="sidebar-close-button" id="rightSidebarCloseButton">&times;</button>
+        <div class="p-4 text-center">
+            <h3 class="text-xl font-bold mb-4">More Info</h3>
+        </div>
+        <ul>
+            <li><a href="#" class="sidebar-nav-item" data-target="aboutWebsiteSection">About Website</a></li>
+            <li><a href="#" class="sidebar-nav-item" data-target="developerInfoSection">Developer Info</a></li>
+            <li><a href="#" class="sidebar-nav-item" data-target="contactSection">Contact</a></li>
+            <li><a href="#" class="sidebar-nav-item" data-target="horoscopeKnowledgeSection">ဗေဒင် Knowledge</a></li>
+        </ul>
+    </div>
+
+    <!-- Sidebar Backdrop (Single backdrop for both sidebars) -->
+    <div id="sidebarBackdrop" class="sidebar-backdrop"></div>
+
+    <!-- Website Navigation Menu -->
+    <nav class="bg-gradient-to-r from-blue-600 to-purple-700">
+        <div class="flex items-center">
+            <h2 id="navTitle" class="text-white">
+                <span class="inline-block transform rotate-12">🔮</span> AI ဗေဒင်ဆရာ
+            </h2>
+        </div>
+        <!-- Main nav links for desktop -->
+        <div id="mainNavDesktopLinks" class="hidden md:flex flex-grow justify-end space-x-4">
+            <a href="#" class="nav-item" data-target="mainHoroscopeSection">ပင်မစာမျက်နှာ</a>
+            <a href="#" class="nav-item" data-target="dailyHoroscopeSection">နေ့စဉ် ကံဇာတာ</a>
+            <a href="#" class="nav-item" data-target="tarotCardSection">တားရော့ကဒ် ဗေဒင်</a>
+            <a href="#" class="nav-item" data-target="dreamInterpretationSection">အိပ်မက် နိမိတ်ဖတ်ခြင်း</a>
+        </div>
+        <!-- Mobile-only Main Menu Toggle (Hamburger) -->
+        <div class="md:hidden">
+            <button id="mainMenuToggleButton" class="text-white focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                </svg>
+            </button>
+        </div>
+        <!-- New Sidebar Toggle Button (Info/Settings Icon) -->
+        <button id="infoSidebarToggleButton" class="text-white focus:outline-none ml-4">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+            </svg>
+        </button>
+    </nav>
+
+    <div class="container">
+        <!-- Main Horoscope Section -->
+        <div id="mainHoroscopeSection">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">🔮 မြန်မာ AI ဗေဒင်ဆရာ 🔮</h1>
+            <p class="text-gray-600 mb-6 header-text-animation">သင်သိလိုရာကို မေးမြန်းနိုင်ပြီး AI ဗေဒင်ဆရာက ပြန်လည်ဟောပြောပေးပါလိမ့်မယ်။</p>
+
+            <div class="input-group">
+                <input type="text" id="userName" placeholder=" " class="block w-full">
+                <label for="userName">သင့်အမည် (မဖြစ်မနေ)</label>
+            </div>
+
+            <div class="input-group">
+                <input type="text" id="userDob" placeholder=" " class="block w-full">
+                <label for="userDob">မွေးသက္ကရာဇ် (မဖြစ်မနေ)</label>
+            </div>
+
+            <div class="input-group">
+                <input type="text" id="userDay" placeholder=" " class="block w-full">
+                <label for="userDay">သင့်နေ့နံ (ဥပမာ: တနင်္ဂနွေ)</label>
+            </div>
+
+            <div class="input-group mb-6">
+                <textarea id="userQuestion" rows="4" placeholder=" " class="block w-full"></textarea>
+                <label for="userQuestion">သင်သိလိုသော မေးခွန်း (အသေးစိတ်ရေးပါ)</label>
+            </div>
+
+            <div class="template-questions-section mb-6">
+                <p class="text-gray-700 text-sm font-medium mb-3 text-left">အမြန်မေးလိုသော မေးခွန်းများ:</p>
+                <div id="templateQuestions" class="flex flex-wrap gap-2 justify-start">
+                    <span class="template-chip">ဒီတစ်ပတ် ကံဇာတာ ဘယ်လိုရှိမလဲ။</span>
+                    <span class="template-chip">အလုပ်အကိုင် အခြေအနေ ဘယ်လိုရှိမလဲ။</span>
+                    <span class="template-chip">ကျန်းမာရေး ဘယ်လိုနေမလဲ။</span>
+                    <span class="template-chip">ငွေကြေး အခြေအနေ ဘယ်လိုရှိမလဲ။</span>
+                    <span class="template-chip">အချစ်ရေး အခြေအနေ ဘယ်လိုရှိမလဲ။</span>
+                    <span class="template-chip">ပညာရေး ကံဇာတာ ဘယ်လိုရှိမလဲ။</span>
+                </div>
+            </div>
+
+            <div id="messageBox" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md relative mb-4 hidden" role="alert">
+                <span id="messageText"></span>
+            </div>
+
+            <button id="askButton">ဗေဒင်မေးမည်</button>
+
+            <div id="responseArea" class="response-box hidden mt-6">
+                <p class="horoscope-title">
+                    ဗေဒင်ဆရာ၏ အဖြေ:
+                </p>
+                <p id="horoscopeResult"></p>
+            </div>
+            
+            <!-- Old navigation buttons removed -->
+        </div>
+
+        <!-- Daily Horoscope Section (Initially Hidden) -->
+        <div id="dailyHoroscopeSection" class="hidden">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">🗓️ နေ့စဉ် ကံဇာတာ 🗓️</h1>
+            <p class="text-gray-600 mb-6 header-text-animation">သင်သိလိုသော နေ့နံအလိုက် နေ့စဉ် ကံဇာတာကို ရွေးချယ်ကြည့်ရှုနိုင်ပါသည်။</p>
+
+            <div class="day-icons-grid" id="dayIconsContainer">
+                <div class="day-icon" data-day="တနင်္ဂနွေ" data-emoji="🌞">🌞<span>တနင်္ဂနွေ</span></div>
+                <div class="day-icon" data-day="တနင်္လာ" data-emoji="🐅">🐅<span>တနင်္လာ</span></div>
+                <div class="day-icon" data-day="အင်္ဂါ" data-emoji="🦁">🦁<span>အင်္ဂါ</span></div>
+                <div class="day-icon" data-day="ဗုဒ္ဓဟူး" data-emoji="🐘">🐘<span>ဗုဒ္ဓဟူး</span></div>
+                <div class="day-icon" data-day="ရာဟု" data-emoji="🐘💔">🐘💔<span>ရာဟု</span></div>
+                <div class="day-icon" data-day="ကြာသပတေး" data-emoji="🐭">🐭<span>ကြာသပတေး</span></div>
+                <div class="day-icon" data-day="သောကြာ" data-emoji="🐭">🐭<span>သောကြာ</span></div>
+                <div class="day-icon" data-day="စနေ" data-emoji="🐉">🐉<span>စနေ</span></div>
+            </div>
+
+            <div id="dailyHoroscopeResultArea" class="response-box hidden mt-6 daily-horoscope-result-area">
+                <p class="horoscope-title">
+                    ရွေးချယ်ထားသောနေ့၏ ကံဇာတာ:
+                </p>
+                <p id="dailyHoroscopeResultContent"></p>
+            </div>
+
+            <button id="backToMainButton">ပင်မစာမျက်နှာသို့ ပြန်သွားမည်</button>
+        </div>
+
+        <!-- Tarot Card Section (Initially Hidden) -->
+        <div id="tarotCardSection" class="hidden">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">🃏 တားရော့ကဒ် ဗေဒင် 🃏</h1>
+            <p class="text-gray-600 mb-6 header-text-animation">သင့်စိတ်ကြိုက် ကဒ်တစ်ချပ် ရွေးချယ်ပြီး ကံကြမ္မာကို သိရှိနိုင်ပါသည်။</p>
+
+            <div class="tarot-cards-grid" id="tarotCardsContainer">
+                <!-- Tarot card backs will be generated here by JavaScript -->
+            </div>
+            
+            <button id="backToMainFromTarotButton">ပင်မစာမျက်နှာသို့ ပြန်သွားမည်</button>
+        </div>
+
+        <!-- Tarot Card Modal (Specific to Tarot, with its own loading) -->
+        <div id="tarotModal" class="modal">
+            <div class="modal-content">
+                <button class="modal-close-button" id="closeTarotModal">&times;</button>
+                <!-- Loading indicator inside the tarot modal -->
+                <div id="modalTarotLoading" class="modal-loading-indicator hidden">
+                    <div class="loading mb-2"></div>
+                    <p class="text-gray-700 text-lg">ခဏစောင့်ပါ...</p>
+                </div>
+                <!-- Tarot card content and reading -->
+                <div id="modalTarotContent" class="modal-body hidden">
+                    <div class="modal-card-display">
+                        <img id="modalCardImage" src="" alt="Tarot Card">
+                        <span class="card-name" id="modalCardName"></span>
+                    </div>
+                    <div class="modal-reading-content">
+                        <h3 id="modalReadingTitle"></h3>
+                        <p id="modalTarotReading"></p>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button id="pickAnotherCardButton">အခြားကဒ်တစ်ခု ရွေးချယ်မည်</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dream Interpretation Section (Initially Hidden) -->
+        <div id="dreamInterpretationSection" class="hidden">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">💭 အိပ်မက်နိမိတ်ဖတ်ခြင်း 💭</h1>
+            <p class="text-gray-600 mb-6 header-text-animation">သင်မက်ခဲ့သော အိပ်မက်အကြောင်းကို အသေးစိတ် ရေးသား၍ နိမိတ်ဖတ်နိုင်ပါသည်။</p>
+            
+            <div class="input-group mb-6">
+                <textarea id="dreamTextInput" rows="6" placeholder=" " class="block w-full"></textarea>
+                <label for="dreamTextInput">သင့်အိပ်မက်အကြောင်းအရာကို ရေးပါ</label>
+            </div>
+
+            <!-- Dream Templates Section -->
+            <div class="dream-templates-section mb-6">
+                <p class="text-gray-700 text-sm font-medium mb-3 text-left">အမြန်နိမိတ်ဖတ်လိုသော အိပ်မက်များ:</p>
+                <ul id="dreamTemplatesContainer" class="dream-template-list">
+                    <!-- Dream templates will be populated here by JavaScript -->
+                </ul>
+            </div>
+
+            <button id="interpretDreamButton">နိမိတ်ဖတ်မည်</button>
+
+            <div id="dreamInterpretationResultArea" class="response-box hidden mt-6 dream-interpretation-result-area">
+                <p class="horoscope-title">
+                    အိပ်မက်နိမိတ်ဖွင့်ဆိုချက်:
+                </p>
+                <p id="dreamInterpretationResultContent"></p>
+            </div>
+
+            <button id="backToMainFromDreamButton">ပင်မစာမျက်နှာသို့ ပြန်သွားမည်</button>
+        </div>
+
+        <!-- New sections for sidebar content (initially hidden) -->
+        <div id="aboutWebsiteSection" class="hidden text-left bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold mb-4 text-gray-800">Website အကြောင်း</h2>
+            <p class="text-gray-700 mb-4">
+                ဤ "မြန်မာ AI ဗေဒင်ဆရာ" ဝဘ်ဆိုက်သည် မြန်မာ့ရိုးရာ ဗေဒင်ပညာနှင့် ခေတ်မီ AI နည်းပညာတို့ကို ပေါင်းစပ်ထားသော ဝန်ဆောင်မှုတစ်ခု ဖြစ်ပါသည်။ အသုံးပြုသူများအနေဖြင့် မိမိတို့ သိလိုသော မေးခွန်းများ၊ နေ့စဉ် ကံဇာတာများ၊ တားရော့ကဒ် ဗေဒင်များနှင့် အိပ်မက်နိမိတ်ဖတ်ခြင်းများကို AI စနစ်မှတစ်ဆင့် အလွယ်တကူ ဟောပြောခွင့်ရရှိနိုင်ပါသည်။ ကျွန်ုပ်တို့၏ ရည်ရွယ်ချက်မှာ မြန်မာ့ဗေဒင်ပညာကို လူတိုင်းအလွယ်တကူ အသုံးပြုနိုင်စေရန်နှင့် အပြုသဘောဆောင်သော အကြံဉာဏ်များ ပေးနိုင်ရန် ဖြစ်ပါသည်။
+            </p>
+            <button id="backToMainFromAbout" class="mt-4 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-300 ease-in-out">ပင်မစာမျက်နှာသို့ ပြန်သွားမည်</button>
+        </div>
+
+        <div id="developerInfoSection" class="hidden text-left bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold mb-4 text-gray-800">Developer အချက်အလက်</h2>
+            <p class="text-gray-700 mb-4">
+                ဤဝဘ်ဆိုက်ကို Google Gemini AI model ကို အခြေခံပြီး ဖန်တီးထားပါသည်။ ၎င်းသည် သဘာဝဘာသာစကား နားလည်မှုနှင့် စာသားထုတ်လုပ်နိုင်စွမ်းရှိသော powerful AI တစ်ခုဖြစ်ပါသည်။ ဤ project ကို ဖန်တီးရာမှာ HTML, CSS (Tailwind CSS ပါဝင်သည်) နှင့် JavaScript တို့ကို အသုံးပြုထားပါသည်။
+            </p>
+            <button id="backToMainFromDeveloper" class="mt-4 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-300 ease-in-out">ပင်မစာမျက်နှာသို့ ပြန်သွားမည်</button>
+        </div>
+
+        <div id="contactSection" class="hidden text-left bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold mb-4 text-gray-800">ဆက်သွယ်ရန်</h2>
+            <p class="text-gray-700 mb-4">
+                အကယ်၍ မေးမြန်းစရာများ သို့မဟုတ် အကြံပြုချက်များ ရှိပါက အောက်ပါ လိပ်စာသို့ ဆက်သွယ်နိုင်ပါသည်။
+            </p>
+            <p class="text-gray-700 mb-2"><strong class="text-purple-600">အီးမေးလ်:</strong> example@example.com</p>
+            <p class="text-gray-700 mb-4"><strong class="text-purple-600">ဖုန်းနံပါတ်:</strong> +95 9XXX XXX XXX</p>
+            <p class="text-gray-700">
+                ကျေးဇူးပြု၍ မေးမြန်းလိုသည့် အကြောင်းအရာကို အသေးစိတ် ဖော်ပြပေးပါ။
+            </p>
+            <button id="backToMainFromContact" class="mt-4 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-300 ease-in-out">ပင်မစာမျက်နှာသို့ ပြန်သွားမည်</button>
+        </div>
+
+        <div id="horoscopeKnowledgeSection" class="hidden text-left bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold mb-4 text-gray-800">ဗေဒင် Knowledge</h2>
+            <p class="text-gray-700 mb-4">
+                ဗေဒင်ပညာဆိုသည်မှာ လူတို့၏ အနာဂတ်ကံကြမ္မာ၊ စရိုက်လက္ခဏာနှင့် ဖြစ်ပျက်လာမည့် အကြောင်းအရာများကို ဂြိုလ်နက္ခတ်များ၊ နေ့နံများ၊ မွေးသက္ကရာဇ်များ အစရှိသည်တို့အပေါ် အခြေခံ၍ ဟောပြောသော ပညာရပ်တစ်ခု ဖြစ်ပါသည်။ မြန်မာ့ရိုးရာ ဗေဒင်ပညာတွင် ပုံစံအမျိုးမျိုးရှိပြီး အဓိကအားဖြင့် အောက်ပါတို့ကို တွေ့ရသည်-
+            </p>
+            <ul class="list-disc list-inside text-gray-700 ml-4 mb-4">
+                <li>
+                    <strong>နေ့နံဗေဒင်:</strong> မွေးဖွားသည့် နေ့နံ (တနင်္ဂနွေ၊ တနင်္လာ စသည်) အလိုက် ကံဇာတာ၊ စရိုက်လက္ခဏာနှင့် အနာဂတ်တို့ကို ဟောပြောခြင်း။
+                </li>
+                <li>
+                    <strong>ဂဏန်းဗေဒင်:</strong> မွေးသက္ကရာဇ်၊ အမည် စသည်တို့ကို အခြေခံ၍ ဂဏန်းများ၏ နိမိတ်နှင့် လွှမ်းမိုးမှုကို ကြည့်ရှုကာ ကံကြမ္မာကို ဖော်ထုတ်ခြင်း။
+                </li>
+                <li>
+                    <strong>လက္ခဏာဗေဒင် (လက်ဖဝါးဗေဒင်):</strong> လက်ဖဝါးပေါ်ရှိ လက္ခဏာမျဉ်းကြောင်းများ၊ အမှတ်အသားများနှင့် လက်ချောင်းများ၏ ပုံသဏ္ဍာန်ကို ကြည့်၍ လူတစ်ဦးချင်းစီ၏ ကံကြမ္မာ၊ စရိုက်နှင့် အနာဂတ်ဖြစ်ရပ်များကို ခန့်မှန်းခြင်း။
+                </li>
+                <li>
+                    <strong>တားရော့ကဒ် ဗေဒင်:</strong> တားရော့ကဒ်များ၏ ပုံရိပ်များနှင့် သင်္ကေတများကို အသုံးပြု၍ လက်ရှိအခြေအနေ၊ အခက်အခဲများနှင့် လမ်းညွှန်မှုများကို ဖော်ထုတ်ခြင်း။
+                </li>
+                <li>
+                    <strong>အိပ်မက်နိမိတ်ဖတ်ခြင်း:</strong> မက်ခဲ့သော အိပ်မက်အကြောင်းအရာများကို အခြေခံ၍ နိမိတ်များ၊ ကောင်းကျိုးဆိုးကျိုးများနှင့် ဆောင်ရန်/ရှောင်ရန်များကို ဖွင့်ဆိုခြင်း။
+                </li>
+                <li>
+                    <strong>ရက်ရာဇာ၊ ပြဿဒါး၊ အထွန်းအခါ:</strong> မြန်မာ့ရိုးရာ ဗေဒင်ပညာတွင် အချိန်အခါအလိုက် ကံကောင်းခြင်း၊ ကံဆိုးခြင်းများကို သတ်မှတ်ရာတွင် အသုံးပြုသော နေ့ရက်များ။
+                </li>
+            </ul>
+            <p class="text-gray-700 mb-4">
+                ဗေဒင်ပညာသည် ရှေးနှစ်ပေါင်းများစွာကတည်းက တည်ရှိခဲ့သော ပညာရပ်တစ်ခုဖြစ်ပြီး ယနေ့ခေတ်တွင်လည်း လူအများ စိတ်ဝင်တစား လေ့လာကြဆဲ ဖြစ်ပါသည်။ ဤဝဘ်ဆိုက်သည် ထိုပညာရပ်များကို Google Gemini AI စနစ်ဖြင့် ပေါင်းစပ်ပြီး အသုံးပြုသူများအတွက် အသုံးဝင်သော အကြံဉာဏ်များနှင့် ဗေဒင်ဟောပြောချက်များကို ပေးစွမ်းရန် ကြိုးပမ်းထားပါသည်။
+            </p>
+            <p class="text-gray-700">
+                ဗေဒင်ဟောပြောချက်များသည် အကြံဉာဏ်ပေးခြင်းသာဖြစ်ပြီး၊ လူတစ်ဦးချင်းစီ၏ ကြိုးစားအားထုတ်မှုနှင့် ဆုံးဖြတ်ချက်များအပေါ် မူတည်၍ ရလဒ်များ ကွဲပြားနိုင်ပါသည်။
+            </p>
+            <button id="backToMainFromKnowledge" class="mt-4 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-300 ease-in-out">ပင်မစာမျက်နှာသို့ ပြန်သွားမည်</button>
+        </div>
+
+    </div>
+
+    <!-- Universal Loading Modal (For Main, Daily, and Dream Interpretation API calls) -->
+    <div id="universalLoadingModal" class="modal">
+        <div class="modal-content !w-auto !max-w-xs !p-6 flex flex-col items-center justify-center">
+            <div class="loading mb-4"></div>
+            <p class="text-gray-700 text-lg font-semibold">ခဏစောင့်ပါ...</p>
+        </div>
+    </div>
+
+
+    <script>
+        // Ensure all JavaScript runs after the DOM is fully loaded.
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("DOM fully loaded and parsed. Script execution started."); // DEBUG: confirms script execution after DOM
+
+            const apiKey = "AIzaSyBri-YGH9BxjTT_V7oEnV7ntYnZz_LvJBc";
+
+            // Main Horoscope Section Elements
+            const mainHoroscopeSection = document.getElementById('mainHoroscopeSection');
+            const userNameInput = document.getElementById('userName');
+            const userDobInput = document.getElementById('userDob');
+            const userDayInput = document.getElementById('userDay');
+            const userQuestionInput = document.getElementById('userQuestion');
+            const askButton = document.getElementById('askButton');
+            const responseArea = document.getElementById('responseArea');
+            const horoscopeResult = document.getElementById('horoscopeResult');
+            const templateQuestionsContainer = document.getElementById('templateQuestions');
+            const messageBox = document.getElementById('messageBox');
+            const messageText = document.getElementById('messageText');
+
+            // Daily Horoscope Section Elements
+            const dailyHoroscopeSection = document.getElementById('dailyHoroscopeSection');
+            const dayIconsContainer = document.getElementById('dayIconsContainer');
+            const dailyHoroscopeResultArea = document.getElementById('dailyHoroscopeResultArea');
+            const dailyHoroscopeResultContent = document.getElementById('dailyHoroscopeResultContent');
+            const backToMainButton = document.getElementById('backToMainButton');
+
+            // Tarot Card Section Elements
+            const tarotCardSection = document.getElementById('tarotCardSection');
+            const tarotCardsContainer = document.getElementById('tarotCardsContainer');
+            const backToMainFromTarotButton = document.getElementById('backToMainFromTarotButton');
+
+            // Tarot Modal Elements
+            const tarotModal = document.getElementById('tarotModal');
+            const closeModalButton = document.getElementById('closeTarotModal');
+            const modalCardImage = document.getElementById('modalCardImage');
+            const modalCardName = document.getElementById('modalCardName');
+            const modalReadingTitle = document.getElementById('modalReadingTitle');
+            const modalTarotReading = document.getElementById('modalTarotReading');
+            const pickAnotherCardButton = document.getElementById('pickAnotherCardButton');
+            const modalTarotLoading = document.getElementById('modalTarotLoading');
+            const modalTarotContent = document.getElementById('modalTarotContent');
+
+            // Dream Interpretation Section Elements
+            const dreamInterpretationSection = document.getElementById('dreamInterpretationSection');
+            const dreamTextInput = document.getElementById('dreamTextInput');
+            const interpretDreamButton = document.getElementById('interpretDreamButton');
+            const dreamInterpretationResultArea = document.getElementById('dreamInterpretationResultArea');
+            const dreamInterpretationResultContent = document.getElementById('dreamInterpretationResultContent');
+            const backToMainFromDreamButton = document.getElementById('backToMainFromDreamButton');
+            const dreamTemplatesContainer = document.getElementById('dreamTemplatesContainer'); 
+
+            // Universal Loading Modal Element
+            const universalLoadingModal = document.getElementById('universalLoadingModal');
+
+            // Nav Elements (Main Menu)
+            const navTitle = document.getElementById('navTitle'); // The website title in the nav bar
+            const mainMenuToggleButton = document.getElementById('mainMenuToggleButton'); // Hamburger icon for main nav
+            const mainNavDesktopLinks = document.getElementById('mainNavDesktopLinks'); // Desktop links for main nav
+
+            // Side Bar Elements (Left Sidebar for Main Nav)
+            const leftSidebar = document.getElementById('leftSidebar');
+            const leftSidebarCloseButton = document.getElementById('leftSidebarCloseButton');
+
+            // Side Bar Elements (Right Sidebar for Info Nav)
+            const rightSidebar = document.getElementById('rightSidebar');
+            const rightSidebarToggleButton = document.getElementById('infoSidebarToggleButton'); // New button for right sidebar
+            const rightSidebarCloseButton = document.getElementById('rightSidebarCloseButton');
+
+            // Backdrop (Shared for both sidebars)
+            const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+
+            // All navigation links (for setting active class)
+            const allNavItems = document.querySelectorAll('.nav-item, #leftSidebar .sidebar-nav-item, #rightSidebar .sidebar-nav-item');
+
+            // New section elements for sidebar content
+            const aboutWebsiteSection = document.getElementById('aboutWebsiteSection');
+            const developerInfoSection = document.getElementById('developerInfoSection');
+            const contactSection = document.getElementById('contactSection');
+            const horoscopeKnowledgeSection = document.getElementById('horoscopeKnowledgeSection');
+
+            // Back to Main buttons for new sections
+            const backToMainFromAboutButton = document.getElementById('backToMainFromAbout');
+            const backToMainFromDeveloperButton = document.getElementById('backToMainFromDeveloper');
+            const backToMainFromContactButton = document.getElementById('backToMainFromContact');
+            const backToMainFromKnowledgeButton = document.getElementById('backToMainFromKnowledge');
+
+
+            let currentSelectedDayIcon = null;
+
+            // Tarot card data (simple example, ideally fetch from a more comprehensive source or API)
+            const tarotCards = [
+                { name: "The Fool", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/RWS_Tarot_00_Fool.jpg/220px-RWS_Tarot_00_Fool.jpg" },
+                { name: "The Magician", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/RWS_Tarot_01_Magician.jpg/220px-RWS_Tarot_01_Magician.jpg" },
+                { name: "The High Priestess", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/RWS_Tarot_02_High_Priestess.jpg/220px-RWS_Tarot_02_High_Priestess.jpg" },
+                { name: "The Empress", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/RWS_Tarot_03_Empress.jpg/220px-RWS_Tarot_03_Empress.jpg" },
+                { name: "The Emperor", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/RWS_Tarot_04_Emperor.jpg/220px-RWS_Tarot_04_Emperor.jpg" },
+                { name: "The Hierophant", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/RWS_Tarot_05_Hierophant.jpg/220px-RWS_Tarot_05_Hierophant.jpg" },
+                { name: "The Lovers", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/RWS_Tarot_06_Lovers.jpg/220px-RWS_Tarot_06_Lovers.jpg" },
+                { name: "The Chariot", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/RWS_Tarot_07_Chariot.jpg/220px-RWS_Tarot_07_Chariot.jpg" },
+                { name: "Strength", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/RWS_Tarot_08_Strength.jpg/220px-RWS_Tarot_08_Strength.jpg" },
+                { name: "The Hermit", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/RWS_Tarot_09_Hermit.jpg/220px-RWS_Tarot_09_Hermit.jpg" },
+                { name: "Wheel of Fortune", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/RWS_Tarot_10_Wheel_of_Fortune.jpg/220px-RWS_Tarot_10_Wheel_of_Fortune.jpg" },
+                { name: "Justice", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/RWS_Tarot_11_Justice.jpg/220px-RWS_Tarot_11_Justice.jpg" },
+                { name: "The Hanged Man", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/RWS_Tarot_12_Hanged_Man.jpg/220px-RWS_Tarot_12_Hanged_Man.jpg" },
+                { name: "Death", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/RWS_Tarot_13_Death.jpg/220px-RWS_Tarot_13_Death.jpg" },
+                { name: "Temperance", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/RWS_Tarot_14_Temperance.jpg/220px-RWS_Tarot_14_Temperance.jpg" },
+                { name: "The Devil", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/RWS_Tarot_15_Devil.jpg/220px-RWS_Tarot_15_Devil.jpg" },
+                { name: "The Tower", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/RWS_Tarot_16_Tower.jpg/220px-RWS_Tarot_16_Tower.jpg" },
+                { name: "The Star", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/RWS_Tarot_17_Star.jpg/220px-RWS_Tarot_17_Star.jpg" },
+                { name: "The Moon", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/RWS_Tarot_18_Moon.jpg/220px-RWS_Tarot_18_Moon.jpg" },
+                { name: "The Sun", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/RWS_Tarot_19_Sun.jpg/220px-RWS_Tarot_19_Sun.jpg" },
+                { name: "Judgement", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/RWS_Tarot_20_Judgement.jpg/220px-RWS_Tarot_20_Judgement.jpg" },
+                { name: "The World", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/RWS_Tarot_21_World.jpg/220px-RWS_Tarot_21_World.jpg" }
+            ];
+
+            // Dream interpretation templates (Expanded to ~100 with Burmese alphabet prefixes)
+            const dreamTemplates = [
+                // က
+                { text: "ကျားကိုက်ခြင်း အိပ်မက်", prefix: "က-၁။" },
+                { text: "ကျောင်းဆရာမြင်ခြင်း အိပ်မက်", prefix: "က-၂။" },
+                { text: "ကြက်မွေးခြင်း အိပ်မက်", prefix: "က-၃။" },
+                { text: "ကျောက်မျက်ရတနာရခြင်း အိပ်မက်", prefix: "က-၄။" },
+                { text: "ကြယ်တွေစုံနေခြင်း အိပ်မက်", prefix: "က-၅။" },
+                { text: "ကခုန်ခြင်း အိပ်မက်", prefix: "က-၆။" },
+                { text: "ကြောင်မြင်ခြင်း အိပ်မက်", prefix: "က-၇။" },
+                { text: "ကမ်းခြေရောက်ခြင်း အိပ်မက်", prefix: "က-၈။" },
+                { text: "ကမ်းခြေမှာ ရေကစားခြင်း အိပ်မက်", prefix: "က-၉။" },
+                { text: "ကျိုးပဲ့နေသော ပစ္စည်းများမြင်ခြင်း အိပ်မက်", prefix: "က-၁၀။" },
+                { text: "ကျောက်တုံးကြီး လှိမ့်ချခြင်း အိပ်မက်", prefix: "က-၁၁။" },
+                { text: "ကောက်ရိုးပုံပေါ် လဲလျောင်းခြင်း အိပ်မက်", prefix: "က-၁၂။" },
+                { text: "ကောက်ပဲသီးနှံများ ပေါက်ရောက်ခြင်း အိပ်မက်", prefix: "က-၁၃။" },
+                { text: "ကပ်ရောဂါဖြစ်ခြင်း အိပ်မက်", prefix: "က-၁၄။" },
+                { text: "ကတ္တရာလမ်းဖောက်ခြင်း အိပ်မက်", prefix: "က-၁၅။" },
+                // ခ
+                { text: "ခွေးကိုက်ခြင်း အိပ်မက်", prefix: "ခ-၁။" },
+                { text: "ခေါင်းကနေ သွေးထွက်ခြင်း အိပ်မက်", prefix: "ခ-၂။" },
+                { text: "ချစ်သူဟောင်းနဲ့ ပြန်ဆုံခြင်း အိပ်မက်", prefix: "ခ-၃။" },
+                { text: "ခြင်္သေ့မြင်ခြင်း အိပ်မက်", prefix: "ခ-၄။" },
+                { text: "ချောင်းကို ဖြတ်ကူးခြင်း အိပ်မက်", prefix: "ခ-၅။" },
+                { text: "ချည်ငင်ခြင်း အိပ်မက်", prefix: "ခ-၆။" },
+                { text: "ခြံစည်းရိုး ခတ်ခြင်း အိပ်မက်", prefix: "ခ-၇။" },
+                { text: "ခေါင်းဖြတ်ခံရခြင်း အိပ်မက်", prefix: "ခ-၈။" },
+                { text: "ချဉ်ခြင်းတက်ခြင်း အိပ်မက်", prefix: "ခ-၉။" },
+                { text: "ချားရဟတ်စီးခြင်း အိပ်မက်", prefix: "ခ-၁၀။" },
+                { text: "ခရေပန်း ပွင့်ခြင်း အိပ်မက်", prefix: "ခ-၁၁။" },
+                { text: "ခေါင်းကိုက်ခြင်း အိပ်မက်", prefix: "ခ-၁၂။" },
+                { text: "ချွတ်ယွင်းနေသော သွားများ အိပ်မက်", prefix: "ခ-၁၃။" },
+                // ဂ
+                { text: "ဂူထဲဝင်ရောက်ခြင်း အိပ်မက်", prefix: "ဂ-၁။" },
+                { text: "ဂစ်တာတီးခြင်း အိပ်မက်", prefix: "ဂ-၂။" },
+                { text: "ဂြိုလ်သားမြင်ခြင်း အိပ်မက်", prefix: "ဂ-၃။" },
+                // ဃ
+                { text: "ဃောသနာကြားရခြင်း အိပ်မက်", prefix: "ဃ-၁။" },
+                // င
+                { text: "ငွေကြေးရရှိခြင်း အိပ်မက်", prefix: "င-၁။" },
+                { text: "ငါးဖမ်းခြင်း အိပ်မက်", prefix: "င-၂။" },
+                { text: "ငှက်ပျံသန်းခြင်း အိပ်မက်", prefix: "င-၃။" },
+                { text: "ငှက်အော်သံကြားခြင်း အိပ်မက်", prefix: "င-၄။" },
+                { text: "ငိုကြွေးခြင်း အိပ်မက်", prefix: "င-၅။" },
+                { text: "ငရုတ်သီးစားခြင်း အိပ်မက်", prefix: "င-၆။" },
+                // စ
+                { text: "စစ်ပွဲဖြစ်ခြင်း အိပ်မက်", prefix: "စ-၁။" },
+                { text: "စာမေးပွဲကျခြင်း အိပ်မက်", prefix: "စ-၂။" },
+                { text: "စက်ဘီးစီးခြင်း အိပ်မက်", prefix: "စ-၃။" },
+                { text: "စပါးရိတ်သိမ်းခြင်း အိပ်မက်", prefix: "စ-၄။" },
+                { text: "ဆားပုလင်းကျိုးခြင်း အိပ်မက်", prefix: "စ-၅။" },
+                { text: "စာအုပ်ဖတ်ခြင်း အိပ်မက်", prefix: "စ-၆။" },
+                { text: "ဆူးညှောင့်ခလုတ်တွေ့ခြင်း အိပ်မက်", prefix: "စ-၇။" },
+                { text: "ဆင်စီးခြင်း အိပ်မက်", prefix: "စ-၈။" },
+                { text: "ဆန်ကွဲစားခြင်း အိပ်မက်", prefix: "စ-၉။" },
+                { text: "စခန်းချခြင်း အိပ်မက်", prefix: "စ-၁၀။" },
+                { text: "ဆံပင်ရှည်လာခြင်း အိပ်မက်", prefix: "စ-၁၁။" },
+                // ဇ
+                { text: "ဇာတ်ပွဲကြည့်ခြင်း အိပ်မက်", prefix: "ဇ-၁။" },
+                { text: "ဇီးကွက်အော်သံကြားခြင်း အိပ်မက်", prefix: "ဇ-၂။" },
+                // ည
+                { text: "ညဘက်လမ်းလျှောက်ခြင်း အိပ်မက်", prefix: "ည-၁။" },
+                // ဋ
+                { text: "ဋီကာရေးသားခြင်း အိပ်မက်", prefix: "ဋ-၁။" },
+                // ဌ
+                { text: "ဌက်မြင်ခြင်း အိပ်မက်", prefix: "ဌ-၁။" },
+                // ဒ
+                { text: "ဓားနဲ့ထိုးခံရခြင်း အိပ်မက်", prefix: "ဒ-၁။" },
+                { text: "ဒိုင်ယာရီရေးခြင်း အိပ်မက်", prefix: "ဒ-၂။" },
+                { text: "ဓာတ်ပုံရိုက်ခြင်း အိပ်မက်", prefix: "ဒ-၃။" },
+                // န
+                { text: "နေထွက်ခြင်း အိပ်မက်", prefix: "န-၁။" },
+                { text: "နဂါးမြင်ခြင်း အိပ်မက်", prefix: "န-၂။" },
+                { text: "နွားသတ်ခြင်း အိပ်မက်", prefix: "န-၃။" },
+                { text: "နှင်းတွေကျခြင်း အိပ်မက်", prefix: "န-၄။" },
+                { text: "နတ်သမီးမြင်ခြင်း အိပ်မက်", prefix: "န-၅။" },
+                { text: "နှင်းဆီပန်းပေးခြင်း အိပ်မက်", prefix: "န-၆။" },
+                // ပ
+                { text: "ပိုက်ဆံရခြင်း အိပ်မက်", prefix: "ပ-၁။" },
+                { text: "ပျံသန်းခြင်း အိပ်မက်", prefix: "ပ-၂။" },
+                { text: "ပင့်ကူအိမ်မြင်ခြင်း အိပ်မက်", prefix: "ပ-၃။" },
+                { text: "ပန်းသီးစားခြင်း အိပ်မက်", prefix: "ပ-၄။" },
+                { text: "ပင်လယ်ကူးခြင်း အိပ်မက်", prefix: "ပ-၅။" },
+                { text: "ပွဲလမ်းသဘင်သွားခြင်း အိပ်မက်", prefix: "ပ-၆။" },
+                { text: "ပန်းချီဆွဲခြင်း အိပ်မက်", prefix: "ပ-၇။" },
+                { text: "ပူလောင်ခြင်း အိပ်မက်", prefix: "ပ-၈။" },
+                // ဖ
+                { text: "ဖိနပ်ပျောက်ဆုံးခြင်း အိပ်မက်", prefix: "ဖ-၁။" },
+                { text: "ဖယောင်းတိုင်မီးထွန်းခြင်း အိပ်မက်", prefix: "ဖ-၂။" },
+                // ဗ
+                { text: "ဗုဒ္ဓရုပ်ပွားတော်မြင်ခြင်း အိပ်မက်", prefix: "ဗ-၁။" },
+                { text: "ဗုံတီးခြင်း အိပ်မက်", prefix: "ဗ-၂။" },
+                // ဘ
+                { text: "ဘုရားဖူးသွားခြင်း အိပ်မက်", prefix: "ဘ-၁။" },
+                { text: "ဘောလုံးကန်ခြင်း အိပ်မက်", prefix: "ဘ-၂။" },
+                // မ
+                { text: "မြွေကိုက်ခြင်း အိပ်မက်", prefix: "မ-၁။" },
+                { text: "မီးလောင်ခြင်း အိပ်မက်", prefix: "မ-၂။" },
+                { text: "မင်္ဂလာဆောင်ခြင်း အိပ်မက်", prefix: "မ-၃။" },
+                { text: "မိုးရွာခြင်း အိပ်မက်", prefix: "မ-၄။" },
+                { text: "မီးသတ်သမားမြင်ခြင်း အိပ်မက်", prefix: "မ-၅။" },
+                { text: "မျက်မှန်ကျိုးခြင်း အိပ်မက်", prefix: "မ-၆။" },
+                { text: "မျောက်မြင်ခြင်း အိပ်မက်", prefix: "မ-၇။" },
+                // ယ
+                { text: "ယုန်မြင်ခြင်း အိပ်မက်", prefix: "ယ-၁။" },
+                // ရ
+                { text: "ရေနစ်ခြင်း အိပ်မက်", prefix: "ရ-၁။" },
+                { text: "ရွှေတွေ့ခြင်း အိပ်မက်", prefix: "ရ-၂။" },
+                { text: "ရေကြီးခြင်း အိပ်မက်", prefix: "ရ-၃။" },
+                { text: "ရုပ်ရှင်ကြည့်ခြင်း အိပ်မက်", prefix: "ရ-၄။" },
+                { text: "ရဲတပ်ဖွဲ့ဝင်မြင်ခြင်း အိပ်မက်", prefix: "ရ-၅။" },
+                // လ
+                { text: "လသာခြင်း အိပ်မက်", prefix: "လ-၁။" },
+                { text: "လမ်းပျောက်ခြင်း အိပ်မက်", prefix: "လ-၂။" },
+                { text: "လက်ထပ်ခြင်း အိပ်မက်", prefix: "လ-၃။" },
+                // ဝ
+                { text: "ဝက်ဝံမြင်ခြင်း အိပ်မက်", prefix: "ဝ-၁။" },
+                // သ
+                { text: "သွားကျွတ်ခြင်း အိပ်မက်", prefix: "သ-၁။" },
+                { text: "သေဆုံးခြင်း အိပ်မက်", prefix: "သ-၂။" },
+                { text: "သရဲ သို့မဟုတ် နာနာဘာဝမြင်ခြင်း အိပ်မက်", prefix: "သ-၃။" },
+                { text: "သစ်ပင်ကြီးလဲခြင်း အိပ်မက်", prefix: "သ-၄။" },
+                { text: "သစ်သီးစားခြင်း အိပ်မက်", prefix: "သ-၅။" },
+                { text: "သမီးလေးမွေးဖွားခြင်း အိပ်မက်", prefix: "သ-၆။" },
+                { text: "သူခိုးတွေ့ခြင်း အိပ်မက်", prefix: "သ-၇။" },
+                { text: "သဲကန္တာရထဲရောက်ခြင်း အိပ်မက်", prefix: "သ-၈။" },
+                // ဟ
+                { text: "ဟင်းချက်ခြင်း အိပ်မက်", prefix: "ဟ-၁။" },
+                { text: "ဟိုတယ်တည်းခိုခြင်း အိပ်မက်", prefix: "ဟ-၂။" },
+                // ဠ
+                { text: "ဠင်းတပျံသန်းခြင်း အိပ်မက်", prefix: "ဠ-၁။" },
+                // အ
+                { text: "အမြင့်က ပြုတ်ကျခြင်း အိပ်မက်", prefix: "အ-၁။" },
+                { text: "အဝတ်အစားမပါဘဲ အိပ်မက်", prefix: "အ-၂။" },
+                { text: "အလုပ်အင်တာဗျူးဖြေခြင်း အိပ်မက်", prefix: "အ-၃။" },
+                { text: "အိမ်ပြောင်းရွှေ့ခြင်း အိပ်မက်", prefix: "အ-၄။" },
+                { text: "အစိမ်းရောင်မြင်ခြင်း အိပ်မက်", prefix: "အ-၅။" },
+                { text: "အသုဘအခမ်းအနားသွားခြင်း အိပ်မက်", prefix: "အ-၆။" },
+                { text: "အိမ်မွေးတိရစ္ဆာန် သေဆုံးခြင်း အိပ်မက်", prefix: "အ-၇။" },
+                { text: "အနက်ရောင်အဝတ်အစားဝတ်ခြင်း အိပ်မက်", prefix: "အ-၈။" },
+                { text: "အစာရေစာ ပြတ်လပ်ခြင်း အိပ်မက်", prefix: "အ-၉။" },
+                { text: "အမဲလိုက်ခြင်း အိပ်မက်", prefix: "အ-၁၀။" },
+            ];
+
+            // Function to show custom message
+            function showMessage(message, type = 'error') {
+                messageText.textContent = message;
+                messageBox.className = `px-4 py-3 rounded-md relative mb-4 ${type === 'error' ? 'bg-red-100 border border-red-400 text-red-700' : 'bg-green-100 border border-green-400 text-green-700'}`;
+                messageBox.classList.remove('hidden');
+                // Clear any existing timeout to prevent message from disappearing prematurely
+                if (messageBox._timeoutId) {
+                    clearTimeout(messageBox._timeoutId);
+                }
+                messageBox._timeoutId = setTimeout(() => {
+                    messageBox.classList.add('hidden');
+                }, 10000); // Show for 10 seconds
+            }
+
+            // Material Input ၏ Label များကို Placeholder အစား ထားရှိခြင်း
+            const inputs = document.querySelectorAll('.input-group input, .input-group textarea');
+            inputs.forEach(input => {
+                if (input.value.trim() !== '') {
+                    input.parentNode.querySelector('label').style.top = '-0.5rem';
+                    input.parentNode.querySelector('label').style.fontSize = '0.8rem';
+                    input.parentNode.querySelector('label').style.transform = 'scale(0.9)';
+                    input.parentNode.querySelector('label').style.left = '0.75rem';
+                }
+
+                input.addEventListener('input', () => {
+                    const label = input.parentNode.querySelector('label');
+                    if (input.value.trim() !== '') {
+                        label.style.top = '-0.5rem';
+                        label.style.fontSize = '0.8rem';
+                        label.style.transform = 'scale(0.9)';
+                        label.style.left = '0.75rem';
+                    } else {
+                        label.style.top = '0.75rem';
+                        label.style.fontSize = '1rem';
+                        label.style.transform = 'scale(1)';
+                        label.style.left = '1rem';
+                    }
+                    // Hide message box when user starts typing/interacting
+                    messageBox.classList.add('hidden');
+                    if (messageBox._timeoutId) {
+                        clearTimeout(messageBox._timeoutId);
+                    }
+                });
+                input.addEventListener('focus', () => {
+                    const label = input.parentNode.querySelector('label');
+                    label.style.top = '-0.5rem';
+                    label.style.fontSize = '0.8rem';
+                    label.style.transform = 'scale(0.9)';
+                    label.style.left = '0.75rem';
+                    // Hide message box when user focuses on an input
+                    messageBox.classList.add('hidden');
+                    if (messageBox._timeoutId) {
+                        clearTimeout(messageBox._timeoutId);
+                    }
+                });
+                input.addEventListener('blur', () => {
+                    const label = input.parentNode.querySelector('label');
+                    if (input.value.trim() === '') {
+                        label.style.top = '0.75rem';
+                        label.style.fontSize = '1rem';
+                        label.style.transform = 'scale(1)';
+                        label.style.left = '1rem';
+                    }
+                });
+            });
+
+            // Main Page Template Questions
+            templateQuestionsContainer.addEventListener('click', (event) => {
+                if (event.target.classList.contains('template-chip')) {
+                    userQuestionInput.value = event.target.textContent.trim();
+                    const label = userQuestionInput.parentNode.querySelector('label');
+                    if (userQuestionInput.value.trim() !== '') {
+                        label.style.top = '-0.5rem';
+                        label.style.fontSize = '0.8rem';
+                        label.style.transform = 'scale(0.9)';
+                        label.style.left = '0.75rem';
+                    } else {
+                        label.style.top = '0.75rem';
+                        label.style.fontSize = '1rem';
+                        label.style.transform = 'scale(1)';
+                        label.style.left = '1rem';
+                    }
+                    // Hide message box when a template chip is clicked
+                    messageBox.classList.add('hidden');
+                    if (messageBox._timeoutId) {
+                        clearTimeout(messageBox._timeoutId);
+                    }
+                }
+            });
+
+            // Function to fetch daily horoscope for a specific day
+            async function fetchDailyHoroscopen(day) { 
+                universalLoadingModal.classList.add('show');
+                dailyHoroscopeResultArea.classList.add('hidden');
+                dailyHoroscopeResultContent.textContent = '';
+
+                const prompt = `သင်ဟာ မြန်မာ့ရိုးရာ ဗေဒင်ပညာကို ကျွမ်းကျင်တဲ့ ဗေဒင်ဆရာတစ်ဦးဖြစ်ပါတယ်။ ${day} နေ့အတွက် နေ့စဉ်ကံဇာတာကို မြန်မာဗေဒင်ပညာအတိုင်း အသေးစိတ်ဟောပြောပေးပါ။ အပြုသဘောဆောင်ပြီး မျှော်လင့်ချက်ပေးတဲ့ ပုံစံမျိုး ဖြစ်ရပါမယ်။ ကံမကောင်းသော အခြေအနေများအတွက် လိုက်နာသင့်သည့် ရိုးရှင်းသော ယတြာ (ဥပမာ - ဘုရားစောင်းတန်းလှဲခြင်း၊ ကံကောင်းစေသော အပြုအမူများ) သို့မဟုတ် ကံကောင်းစေသော အကြံဉာဏ်များကိုလည်း အမြဲတမ်း ထည့်သွင်းဖြေကြားပေးပါ။ ထို့အပြင်၊ ကံကောင်းစေသော အရောင် ၃ ရောင်နှင့် ကံကောင်းစေသော ဂဏန်း ၃ လုံးကိုလည်း အောက်ပါပုံစံအတိုင်း ထည့်သွင်းဖော်ပြပေးပါ။
+ကံကောင်းစေသောအရောင်များ: [အရောင်၁], [အရောင်၂], [အရောင်၃]
+ကံကောင်းစေသောဂဏန်းများ: [ဂဏန်း၁], [ဂဏန်း၂], [ဂဏန်း၃]
+
+မေးခွွန်း: ${day} နေ့အတွက် နေ့စဉ်ကံဇာတာကို သိလိုပါသည်။
+
+ဖြေ:`;
+
+                try {
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                    const payload = {
+                        contents: [{
+                            role: "user",
+                            parts: [{ text: prompt }]
+                        }]
+                    };
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(`API error: ${response.status} ${response.statusText} - ${JSON.stringify(errorData)}`);
+                    }
+
+                    const result = await response.json();
+
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        const aiResponseText = result.candidates[0].content.parts[0].text;
+                        dailyHoroscopeResultContent.textContent = aiResponseText;
+                        dailyHoroscopeResultArea.classList.remove('hidden');
+                        dailyHoroscopeResultArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    } else {
+                        dailyHoroscopeResultContent.textContent = 'နေ့စဉ်ကံဇာတာဟောပြောရာတွင် အမှားအယွင်း ရှိနေပါသည်။ ပြန်လည်ကြိုးစားပါ။';
+                        dailyHoroscopeResultArea.classList.remove('hidden');
+                    }
+
+                } catch (error) {
+                    console.error('Error fetching daily horoscope:', error);
+                    dailyHoroscopeResultContent.textContent = `နေ့စဉ်ကံဇာတာဟောပြောရာတွင် အမှားအယွင်း ဖြစ်ပွားခဲ့ပါသည်။ (${error.message}) ကျေးဇူးပြု၍ ခဏအကြာတွင် ထပ်မံကြိုးစားကြည့်ပါ။`;
+                    dailyHoroscopeResultArea.classList.remove('hidden');
+                } finally {
+                    universalLoadingModal.classList.remove('show');
+                }
+            }
+
+            // Get current day of the week in Burmese
+            function getCurrentBurmeseDay() {
+                const days = ["တနင်္ဂနွေ", "တနင်္လာ", "အင်္ဂါ", "ဗုဒ္ဓဟူး", "ကြာသပတေး", "သောကြာ", "စနေ"];
+                const date = new Date();
+                const dayIndex = date.getDay(); // 0 for Sunday, 1 for Monday, etc.
+                return days[dayIndex];
+            }
+
+            // Event listener for the "ဗေဒင်မေးမည်" button (main horoscope)
+            askButton.addEventListener('click', async () => {
+                console.log("ဗေဒင်မေးမည် button clicked!"); // DEBUG: Log when button is clicked
+
+                const name = userNameInput.value.trim();
+                const dob = userDobInput.value.trim();
+                const userQuestion = userQuestionInput.value.trim();
+                const day = userDayInput.value.trim(); 
+
+                if (!name || !dob || !userQuestion) {
+                    console.log("Validation failed: Inputs missing."); // DEBUG
+                    showMessage('ကျေးဇူးပြု၍ သင့်အမည်၊ မွေးသက္ကရာဇ်နှင့် မေးခွန်းတို့ကို ပြည့်စုံစွာ ဖြည့်သွင်းပါ။', 'error');
+                    return;
+                }
+
+                console.log("Validation passed. Initiating API call for main horoscope."); // DEBUG
+
+                universalLoadingModal.classList.add('show');
+                responseArea.classList.add('hidden');
+                horoscopeResult.textContent = '';
+                askButton.disabled = true;
+                messageBox.classList.add('hidden');
+
+                const prompt = `သင်ဟာ မြန်မာ့ရိုးရာ ဗေဒင်ပညာကို ကျွမ်းကျင်တဲ့ ဗေဒင်ဆရာတစ်ဦးဖြစ်ပါတယ်။ သင့်ဆီလာရောက် မေးမြန်းတဲ့သူတွေရဲ့ မေးခွန်းတွေကို ဗေဒင်သဘောအရ (ဥပမာ - ဇာတာခွင်၊ လက္ခဏာ စတာတွေနဲ့ ဆက်စပ်ပြီး) နိမိတ်ဖတ်ပေးပါ။ သင့်အဖြေတွေက အမြဲတမ်း အပြုသဘောဆောင်ပြီး မျှော်လင့်ချက်ပေးတဲ့ ပုံစံမျိုး ဖြစ်ရပါမယ်။ အတိအကျကြီး မှန်ဖို့ထက် ပုံစံတူယောင်ဆောင်မှုနဲ့ ဗေဒင်ဟောတဲ့ဟန်ပန်က ပိုအရေးကြီးပါတယ်။
+
+အရေးကြီးသည်။ အကယ်၍ အဖြေတွင် စိန်ခေါ်မှုများ၊ အတားအဆီးများ သို့မဟုတ် မကောင်းသော လက္ခဏာများ ပါဝင်လာပါက၊ ထိုအခြေအနေများကို ကျော်လှမ်းနိုင်ရန် သို့မဟုတ် ကောင်းမွန်အောင် ပြုလုပ်နိုင်ရန်အတွက် လိုက်နာသင့်သည့် ရိုးရှင်းသော ယတြာ (ဥပမာ - ဘုရားစောင်းတန်းလှဲခြင်း၊ ကံကောင်းစေသော အပြုအမူများ) သို့မဟုတ် ကံကောင်းစေသော အကြံဉာဏ်များကိုလည်း အမြဲတမ်း ထည့်သွင်းဖြေကြားပေးပါ။
+
+ထို့အပြင်၊ ဤတစ်ပတ်အတွက် သင့်နေ့နံနှင့် ကိုက်ညီသော ကံကောင်းစေသော အရောင် ၃ ရောင်နှင့် ကံကောင်းစေသော ဂဏန်း ၃ လုံးကိုလည်း အောက်ပါပုံစံအတိုင်း ထည့်သွင်းဖော်ပြပေးပါ။
+ကံကောင်းစေသောအရောင်များ: [အရောင်၁], [အရောင်၂], [အရောင်၃]
+ကံကောင်းစေသောဂဏန်းများ: [ဂဏန်း၁], [ဂဏန်း၂], [ဂဏန်း၃]
+
+မေးသူအမည်: ${name}
+မွေးသက္ကရာဇ်: ${dob}
+${day ? `နေ့နံ: ${day}` : ''}
+မေးခွန်း: ${userQuestion}
+
+ဖြေ:`;
+
+                try {
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                    const payload = {
+                        contents: [{
+                            role: "user",
+                            parts: [{ text: prompt }]
+                        }]
+                    };
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(`API error: ${response.status} ${response.statusText} - ${JSON.stringify(errorData)}`);
+                    }
+
+                    const result = await response.json();
+
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        const aiResponseText = result.candidates[0].content.parts[0].text;
+                        horoscopeResult.textContent = aiResponseText;
+                        responseArea.classList.remove('hidden');
+
+                        responseArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    } else {
+                        horoscopeResult.textContent = 'ဗေဒင်ဟောပြောရာတွင် အမှားအယွင်း ရှိနေပါသည်။ ပြန်လည်ကြိုးစားပါ။';
+                        responseArea.classList.remove('hidden');
+                    }
+
+                } catch (error) {
+                    console.error('Error fetching horoscope:', error);
+                    horoscopeResult.textContent = `ဗေဒင်ဟောပြောရာတွင် အမှားအယွင်း ဖြစ်ပွားခဲ့ပါသည်။ (${error.message}) ကျေးဇူးပြု၍ ခဏအကြာတွင် ထပ်မံကြိုးစားကြည့်ပါ။`;
+                    responseArea.classList.remove('hidden');
+                } finally {
+                    universalLoadingModal.classList.remove('show');
+                    askButton.disabled = false;
+                }
+            });
+
+            // Function to show a specific section and hide others and update active nav item
+            function showSection(sectionId) {
+                const sections = [
+                    mainHoroscopeSection,
+                    dailyHoroscopeSection,
+                    tarotCardSection,
+                    dreamInterpretationSection,
+                    aboutWebsiteSection,
+                    developerInfoSection,
+                    contactSection,
+                    horoscopeKnowledgeSection
+                ];
+
+                sections.forEach(section => {
+                    if (section.id === sectionId) {
+                        section.classList.remove('hidden');
+                        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    } else {
+                        section.classList.add('hidden');
+                    }
+                });
+
+                // Update active state of navigation items
+                allNavItems.forEach(item => {
+                    if (item.dataset.target === sectionId) {
+                        item.classList.add('active');
+                    } else {
+                        item.classList.remove('active');
+                    }
+                });
+
+                // Hide message box and clear results when switching sections
+                messageBox.classList.add('hidden');
+                responseArea.classList.add('hidden');
+                dailyHoroscopeResultArea.classList.add('hidden');
+                dreamInterpretationResultArea.classList.add('hidden');
+                tarotModal.classList.remove('show'); // Hide tarot modal if open
+
+                // Close both sidebars when a navigation item is clicked
+                leftSidebar.classList.remove('show-sidebar');
+                rightSidebar.classList.remove('show-sidebar');
+                sidebarBackdrop.classList.remove('show-backdrop');
+                console.log(`Switched to section: ${sectionId}`); // DEBUG
+
+                // Special handling for section-specific content generation
+                if (sectionId === 'tarotCardSection') {
+                    generateTarotCards();
+                } else if (sectionId === 'dreamInterpretationSection') {
+                    populateDreamTemplates();
+                }
+            }
+
+            // Function to close all sidebars and hide backdrop
+            function closeAllSidebars() {
+                leftSidebar.classList.remove('show-sidebar');
+                rightSidebar.classList.remove('show-sidebar');
+                sidebarBackdrop.classList.remove('show-backdrop');
+                console.log("All sidebars closed."); // DEBUG
+            }
+
+            // Event listener for main menu toggle button (left sidebar)
+            mainMenuToggleButton.addEventListener('click', () => {
+                console.log("Main Menu (Hamburger) button clicked!"); // DEBUG
+                closeAllSidebars(); // Close any other open sidebar first
+                leftSidebar.classList.add('show-sidebar');
+                sidebarBackdrop.classList.add('show-backdrop');
+            });
+
+            // Event listener for left sidebar close button
+            leftSidebarCloseButton.addEventListener('click', () => {
+                console.log("Left sidebar close button clicked."); // DEBUG
+                closeAllSidebars();
+            });
+
+            // Event listener for new info sidebar toggle button (right sidebar)
+            rightSidebarToggleButton.addEventListener('click', () => {
+                console.log("Info Sidebar (dots) button clicked!"); // DEBUG
+                closeAllSidebars(); // Close any other open sidebar first
+                rightSidebar.classList.add('show-sidebar');
+                sidebarBackdrop.classList.add('show-backdrop');
+            });
+
+            // Event listener for right sidebar close button
+            rightSidebarCloseButton.addEventListener('click', () => {
+                console.log("Right sidebar close button clicked."); // DEBUG
+                closeAllSidebars();
+            });
+
+            // Event listener for clicking outside any sidebar (backdrop) to close it
+            sidebarBackdrop.addEventListener('click', () => {
+                console.log("Sidebar backdrop clicked (closing all sidebars)."); // DEBUG
+                closeAllSidebars();
+            });
+
+            // Event listeners for ALL navigation links (desktop nav and both sidebar navs)
+            allNavItems.forEach(item => {
+                item.addEventListener('click', (event) => {
+                    event.preventDefault(); // Prevent default link behavior
+                    const targetId = item.dataset.target;
+                    showSection(targetId);
+                });
+            });
+
+            // Event listener for day icons
+            dayIconsContainer.addEventListener('click', async (event) => {
+                let targetIcon = event.target;
+                if (targetIcon.tagName === 'SPAN' || targetIcon.tagName === 'IMG') {
+                    targetIcon = targetIcon.parentNode;
+                }
+
+                if (targetIcon.classList.contains('day-icon')) {
+                    if (currentSelectedDayIcon) {
+                        currentSelectedDayIcon.classList.remove('selected');
+                    }
+
+                    const day = targetIcon.dataset.day;
+                    targetIcon.classList.add('selected');
+                    currentSelectedDayIcon = targetIcon;
+                    console.log(`Daily horoscope icon clicked for day: ${day}`); // DEBUG
+                    await fetchDailyHoroscopen(day); 
+                }
+            });
+
+            // Tarot Card Functions
+            function generateTarotCards() {
+                tarotCardsContainer.innerHTML = '';
+                for (let i = 0; i < 22; i++) {
+                    const cardDiv = document.createElement('div');
+                    cardDiv.classList.add('tarot-card-back');
+                    cardDiv.dataset.cardIndex = i;
+                    cardDiv.innerHTML = '🃏';
+                    cardDiv.style.setProperty('--rotation', `${Math.random() * 360}deg`);
+                    tarotCardsContainer.appendChild(cardDiv);
+                }
+                console.log("Tarot cards generated."); // DEBUG
+            }
+
+            // Function to fetch tarot card reading
+            async function fetchTarotCardReading(cardName, cardImage) {
+                tarotModal.classList.add('show');
+                modalTarotLoading.classList.remove('hidden');
+                modalTarotContent.classList.add('hidden');
+                
+                modalCardImage.src = '';
+                modalCardName.textContent = '';
+                modalReadingTitle.textContent = '';
+                modalTarotReading.textContent = '';
+                console.log(`Fetching tarot reading for: ${cardName}`); // DEBUG
+
+                const prompt = `သင်ဟာ တားရော့ကဒ် ဗေဒင်ပညာကို ကျွမ်းကျင်တဲ့ ဗေဒင်ဆရာတစ်ဦးဖြစ်ပါတယ်။ "${cardName}" တားရော့ကဒ်ကို ရွေးချယ်မိသူအတွက် ကံဇာတာအခြေအနေ၊ အဓိပ္ပာယ်ဖွင့်ဆိုချက်နှင့် လိုက်နာသင့်သည့် အကြံပြုချက်များကို အပြုသဘောဆောင်သော ပုံစံမျိုးဖြင့် အသေးစိတ် ဟောပြောပေးပါ။ အဖြေထဲတွင် ယတြာ (သို့) ကံကောင်းစေသော အပြုအမူများကိုလည်း ထည့်သွင်းပေးပါ။ မြန်မာလို ရေးသားပါ။
+
+မေးခွွန်း: ${cardName} ကဒ်ကို ရွေးချယ်မိသူအတွက် ကံဇာတာကို သိလိုပါသည်။
+
+ဖြေ:`;
+
+                try {
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                    const payload = {
+                        contents: [{
+                            role: "user",
+                            parts: [{ text: prompt }]
+                        }]
+                    };
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(`API error: ${response.status} ${response.statusText} - ${JSON.stringify(errorData)}`);
+                    }
+
+                    const result = await response.json();
+
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        const aiResponseText = result.candidates[0].content.parts[0].text;
+                        
+                        modalCardImage.src = cardImage;
+                        modalCardName.textContent = cardName;
+                        modalReadingTitle.textContent = `${cardName} ကဒ်၏ အနက်ဖွင့်ဆိုချက်:`;
+                        modalTarotReading.textContent = aiResponseText;
+
+                        modalTarotLoading.classList.add('hidden');
+                        modalTarotContent.classList.remove('hidden');
+                        console.log(`Tarot reading for ${cardName} fetched successfully.`); // DEBUG
+                        
+                        tarotModal.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    } else {
+                        showMessage('တားရော့ကဒ် ဟောပြောရာတွင် အမှားအယွင်း ရှိနေပါသည်။ ပြန်လည်ကြိုးစားပါ။', 'error');
+                        modalTarotLoading.classList.add('hidden');
+                        modalTarotContent.classList.remove('hidden');
+                        console.error('Tarot reading: No valid candidate found.'); // DEBUG
+                    }
+
+                } catch (error) {
+                    console.error('Error fetching tarot reading:', error);
+                    showMessage(`တားရော့ကဒ် ဟောပြောရာတွင် အမှားအယွင်း ဖြစ်ပွားခဲ့ပါသည်။ (${error.message}) ကျေးဇူးပြု၍ ခဏအကြာတွင် ထပ်မံကြိုးစားကြည့်ပါ။`, 'error');
+                    modalTarotLoading.classList.add('hidden');
+                    modalTarotContent.classList.remove('hidden');
+                }
+            }
+
+            // Event listener for picking a tarot card
+            tarotCardsContainer.addEventListener('click', async (event) => {
+                let targetCard = event.target;
+                if (targetCard.tagName === 'SPAN' || targetCard.tagName === 'IMG') {
+                    targetCard = targetCard.parentNode;
+                }
+
+                if (targetCard && targetCard.classList.contains('tarot-card-back')) {
+                    document.querySelectorAll('.tarot-card-back').forEach(card => card.classList.remove('selected-card'));
+                    targetCard.classList.add('selected-card');
+
+                    const cardIndex = parseInt(targetCard.dataset.cardIndex);
+                    const selectedTarotCard = tarotCards[cardIndex];
+
+                    if (selectedTarotCard) {
+                        console.log(`Tarot card selected: ${selectedTarotCard.name}`); // DEBUG
+                        await fetchTarotCardReading(selectedTarotCard.name, selectedTarotCard.image);
+                    } else {
+                        showMessage('ရွေးချယ်ထားသော ကဒ်ကို ရှာမတွေ့ပါ။', 'error');
+                        console.error('Selected card not found in tarotCards array.'); // DEBUG
+                    }
+                }
+            });
+
+            // Close modal button
+            closeModalButton.addEventListener('click', () => {
+                tarotModal.classList.remove('show');
+                document.querySelectorAll('.tarot-card-back').forEach(card => card.classList.remove('selected-card'));
+                console.log("Tarot modal closed."); // DEBUG
+            });
+
+            // Pick another card button inside modal
+            pickAnotherCardButton.addEventListener('click', () => {
+                tarotModal.classList.remove('show');
+                tarotCardSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                document.querySelectorAll('.tarot-card-back').forEach(card => card.classList.remove('selected-card'));
+                console.log("Picking another tarot card."); // DEBUG
+            });
+
+            // Dream Interpretation Functions
+            // Function to populate dream templates
+            function populateDreamTemplates() {
+                dreamTemplatesContainer.innerHTML = ''; // Clear existing templates
+                dreamTemplates.forEach(template => {
+                    const listItem = document.createElement('li');
+                    listItem.classList.add('dream-template-item');
+                    listItem.innerHTML = `<span>${template.prefix}</span> ${template.text}`;
+                    listItem.addEventListener('click', async () => {
+                        dreamTextInput.value = template.text;
+                        // Manually trigger label animation for textarea
+                        const label = dreamTextInput.parentNode.querySelector('label');
+                        if (dreamTextInput.value.trim() !== '') {
+                            label.style.top = '-0.5rem';
+                            label.style.fontSize = '0.8rem';
+                            label.style.transform = 'scale(0.9)';
+                            label.style.left = '0.75rem';
+                        } else {
+                            label.style.top = '0.75rem';
+                            label.style.fontSize = '1rem';
+                            label.style.transform = 'scale(1)';
+                            label.style.left = '1rem';
+                        }
+                        console.log(`Dream template selected: ${template.text}`); // DEBUG
+                        await interpretDream(); // Auto-interpret the dream after selecting a template
+                    });
+                    dreamTemplatesContainer.appendChild(listItem);
+                });
+            }
+
+            // Main function to interpret dream
+            async function interpretDream() {
+                const dreamText = dreamTextInput.value.trim();
+
+                if (!dreamText) {
+                    showMessage('ကျေးဇူးပြု၍ သင့်အိပ်မက်အကြောင်းအရာကို ရေးသားပါ သို့မဟုတ် Template မှ ရွေးချယ်ပါ။', 'error');
+                    console.log("Dream interpretation validation failed: Input empty."); // DEBUG
+                    return;
+                }
+
+                universalLoadingModal.classList.add('show');
+                dreamInterpretationResultArea.classList.add('hidden');
+                dreamInterpretationResultContent.textContent = '';
+                interpretDreamButton.disabled = true;
+                messageBox.classList.add('hidden');
+                console.log(`Initiating API call for dream interpretation: ${dreamText}`); // DEBUG
+
+                const prompt = `သင်ဟာ မြန်မာ့ရိုးရာ အိပ်မက်နိမိတ်ဖတ်ပညာကို ကျွမ်းကျင်တဲ့ ဗေဒင်ဆရာတစ်ဦးဖြစ်ပါတယ်။ အသုံးပြုသူ မက်ခဲ့တဲ့ အိပ်မက်အကြောင်းအရာကို အသေးစိတ် ဖတ်ရှုပြီး၊ ထိုအိပ်မက်၏ နိမိတ်၊ အဓိပ္ပာယ်ဖွင့်ဆိုချက် (ကောင်းခြင်း/ဆိုးခြင်း) နှင့် လိုက်နာသင့်သည့် အကြံပြုချက်များ (ဥပမာ- ယတြာ၊ ရှောင်ရန်/ဆောင်ရန်) များကို အပြုသဘောဆောင်သော ပုံစံမျိုးဖြင့် မြန်မာလို ဟောပြောပေးပါ။ အိပ်မက်အကြောင်းအရာက အမှန်တကယ် ဆိုးရွားနေပါကပင် ကောင်းသောအခြေအနေသို့ ပြောင်းလဲနိုင်သည့် နည်းလမ်းများကိုပါ ထည့်သွင်းအကြံပြုပါ။
+
+အိပ်မက်အကြောင်းအရာ: ${dreamText}
+
+နိမိတ်ဖွင့်ဆိုချက်:`;
+
+                try {
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                    const payload = {
+                        contents: [{
+                            role: "user",
+                            parts: [{ text: prompt }]
+                        }]
+                    };
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(`API error: ${response.status} ${response.statusText} - ${JSON.stringify(errorData)}`);
+                    }
+
+                    const result = await response.json();
+
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        const aiResponseText = result.candidates[0].content.parts[0].text;
+                        dreamInterpretationResultContent.textContent = aiResponseText;
+                        dreamInterpretationResultArea.classList.remove('hidden');
+                        dreamInterpretationResultArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        console.log("Dream interpretation fetched successfully."); // DEBUG
+                    } else {
+                        dreamInterpretationResultContent.textContent = 'အိပ်မက်နိမိတ်ဖတ်ရာတွင် အမှားအယွင်း ရှိနေပါသည်။ ပြန်လည်ကြိုးစားပါ။';
+                        dreamInterpretationResultArea.classList.remove('hidden');
+                        console.error('Dream interpretation: No valid candidate found.'); // DEBUG
+                    }
+
+                } catch (error) {
+                    console.error('Error fetching dream interpretation:', error);
+                    dreamInterpretationResultContent.textContent = `အိပ်မက်နိမိတ်ဖတ်ရာတွင် အမှားအယွင်း ဖြစ်ပွားခဲ့ပါသည်။ (${error.message}) ကျေးဇူးပြု၍ ခဏအကြာတွင် ထပ်မံကြိုးစားကြည့်ပါ။`;
+                    dreamInterpretationResultArea.classList.remove('hidden');
+                } finally {
+                    universalLoadingModal.classList.remove('show');
+                    interpretDreamButton.disabled = false;
+                }
+            }
+            // Event listener for "နိမိတ်ဖတ်မည်" button
+            interpretDreamButton.addEventListener('click', interpretDream);
+
+            // Back to Main buttons for new sections (from info sidebar sections)
+            backToMainFromAboutButton.addEventListener('click', () => showSection('mainHoroscopeSection'));
+            backToMainFromDeveloperButton.addEventListener('click', () => showSection('mainHoroscopeSection'));
+            backToMainFromContactButton.addEventListener('click', () => showSection('mainHoroscopeSection'));
+            backToMainFromKnowledgeButton.addEventListener('click', () => showSection('mainHoroscopeSection'));
+
+
+            // Set 'ပင်မစာမျက်နှာ' as active by default on load
+            showSection('mainHoroscopeSection'); // This will also set the active class
+        });
+    </script>
+</body>
+</html>
